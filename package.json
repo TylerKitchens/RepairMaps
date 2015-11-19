@@ -1,0 +1,13 @@
+{
+  "name": "RepairMaps",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node_modules/react-native/packager/packager.sh"
+  },
+  "dependencies": {
+    "moment": "^2.10.6",
+    "react-native": "^0.14.2",
+    "react-native-swipeout": "^2.1.0"
+  }
+}
