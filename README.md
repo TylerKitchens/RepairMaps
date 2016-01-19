@@ -20,6 +20,6 @@ for your reference, for my safe keeping, and for my clients use
 * add an actual login, pretty it up, and the usual stuff
 
 ## Demo Gif
-![RepairMaps](http://www.frogquest.com/files/2015-11-19%20-%20RepairMaps%20v0.2(1).gif)
+![RepairMaps Demo](https://cloud.githubusercontent.com/assets/1640318/12423308/b4298d9c-be7f-11e5-9a15-36edbcc630c6.gif)
 
 
