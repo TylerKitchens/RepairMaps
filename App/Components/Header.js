@@ -38,7 +38,7 @@ var styles = StyleSheet.create({
   },
   headerText: {
     color: '#ffffff',
-    fontSize: 28,
+    fontSize: 26,
     marginLeft: 5,
   }, 
   cacheWarning: {
