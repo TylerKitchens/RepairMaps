@@ -55,7 +55,7 @@ class TrackedItemDetail extends React.Component{
       { label: 'Status', id: 'status' },
       { label: 'RTS', id: 'rts' },
       { label: 'Location', id: 'location' },
-      { label: 'RCS', id: 'rcs_name' },
+      { label: 'RSC', id: 'rsc_name' },
       { label: 'Approval Basis', id: 'approval_basis' },
     ];
 
