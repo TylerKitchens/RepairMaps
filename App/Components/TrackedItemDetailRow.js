@@ -14,15 +14,19 @@ class TrackedItemDetailRow extends React.Component{
   constructor(props){
     super(props);
 
+    this.state = {
+      containerWidth: 0,
+      labelWidth: 0,
+    }
   }
 
   render(){
     return(
-      <View style={styles.itemContainer}>
-        <Text style={styles.label}>
+      <View style={styles.itemContainer} onLayout={(ev)=>this.setState({containerWidth: ev.nativeEvent.layout.width})}>
+        <Text style={styles.label} onLayout={(ev)=>this.setState({labelWidth: ev.nativeEvent.layout.width})}>
           {this.props.label}:&nbsp; 
         </Text>
-        <Text style={styles.value}> 
+        <Text style={[styles.value, {width: this.state.containerWidth - this.state.labelWidth}]}> 
           {this.props.value}
         </Text>
       </View>
