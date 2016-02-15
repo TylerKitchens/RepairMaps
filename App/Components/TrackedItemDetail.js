@@ -20,7 +20,6 @@ class TrackedItemDetail extends React.Component{
   constructor(props){
     super(props);
 
-    console.log('dbug ...aircraft_object.ti_url_seed', );
   }
 
   handlePress(uid){
@@ -85,6 +84,9 @@ let more_info_url =
           </Text>
           <Text style={styles.subtitle}>
             created by {this.props.ti.created_by_user_name} on {this.props.ti.create_date}
+          </Text>
+          <Text style={styles.subtitle}>
+            on {this.props.aircraft_object.aircraft.reg_number}
           </Text>
         </View>
 
