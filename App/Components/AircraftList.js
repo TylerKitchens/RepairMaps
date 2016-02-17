@@ -1,14 +1,17 @@
 'use strict';
 
 var React = require('react-native');
-var GLOBAL = require('../Globals');
-var Swipeout = require('react-native-swipeout');
-var Separator = require('./Separator');
 var Api = require('../Utils/Api');
+var GLOBAL = require('../Globals');
+var Separator = require('./Separator');
+var Swipeout = require('react-native-swipeout');
+var TISearchField = require('./TISearchField');
+var TrackedItemDetail = require('./TrackedItemDetail');
 var TrackedItemIndex = require('./TrackedItemIndex');
 
 var {
   ActivityIndicatorIOS,
+  AlertIOS,
   ListView,
   StyleSheet,
   Text,
@@ -32,7 +35,7 @@ class AircraftList extends React.Component{
   }
 
   componentWillMount(){
-    this._refreshList('didMount');
+    this._refreshList('componentWillMount');
   }
 
   componentWillReceiveProps(){
@@ -42,7 +45,7 @@ class AircraftList extends React.Component{
   _refreshList(caller){
     Api.getCachedTimestamps()
       .then(timestamps => {
-        console.log('dbug REFRESH ListView called from [%s], updating with [%O]', caller, timestamps);
+        console.log('[status] REFRESH AircraftList ListView called from [%s], updating with [%O]', caller, timestamps);
         this.setState({
           cacheTimestamps: timestamps,
           dataSource: this.ds.cloneWithRows(this.props.aircraft_list.aircraft),
@@ -51,12 +54,20 @@ class AircraftList extends React.Component{
   }
 
   _renderHeader(){
+
     return(
-      <ActivityIndicatorIOS
-        style={styles.activityIndicator}
-        animating={this.state.isLoading}
-        color={GLOBAL.COLOR.ORANGE}
-        size="large" />
+      <View style={{paddingTop: 5}}>
+        <TISearchField onSearchSubmit={this.handleSearch.bind(this)} />
+        <Text style={styles.listTitle}>
+          Aircraft List
+        </Text>
+
+        <ActivityIndicatorIOS
+          style={styles.activityIndicator}
+          animating={this.state.isLoading}
+          color={GLOBAL.COLOR.ORANGE}
+          size="large" />
+      </View>
     )
   }
 
@@ -125,11 +136,11 @@ class AircraftList extends React.Component{
     },
     () => 
       Api.getTrackedItems( aircraft_id )
-        .then( aircraft_object => this._handleResponse( aircraft_object ))
+        .then( aircraft_object => this._handleTapResponse( aircraft_object ))
     );
   }
 
-  _handleResponse(aircraft_object){
+  _handleTapResponse(aircraft_object){
     this.setState({
       isLoading: false,
     })
@@ -139,6 +150,78 @@ class AircraftList extends React.Component{
       component: TrackedItemIndex,
       passProps: {aircraft_object: aircraft_object}
     });
+  }
+
+  _handleSearchResponse(uid, aircraft_object){
+    this.setState({ isLoading: false });
+    var ti = aircraft_object.tracked_item.by_unique_identifier[uid]
+
+    this.props.navigator.push({
+      title: uid,
+      component: TrackedItemDetail,
+      passProps: { uid, ti, aircraft_object }
+    })
+  }
+
+
+
+  handleSearch(uid){
+    console.log('[user-action] searches for UID [%s] on AircraftList', uid);
+    
+    var aircraft = this.props.aircraft_list.aircraft;
+    var idx = aircraft.findIndex((el)=>{
+        return el.TIs.indexOf(uid) >= 0;
+    });
+
+    if(idx > -1){
+      console.log('[status] search succeeds');
+
+      var aircraft_id = aircraft[idx].reg_number;
+      this.setState({
+        isLoading: true}, 
+        () => 
+          Api.getTrackedItems( aircraft_id )
+            .then( aircraft_object => this._handleSearchResponse( uid, aircraft_object ))
+      );
+
+    }else{
+      console.log('[status] search fails');
+
+      AlertIOS.alert(
+        uid +' Not Found',
+        'Just as Geraldo Rivera came up empty searching Al Capone\'s vault, we couldn\'t find a tracked item matching the code you entered.',
+        [
+          {text: 'Ok, I\'ll Try Harder', onPress: () => console.log('[user-action] dismiss error modal')},
+        ]
+      )
+    }
+
+    // let item = this.props.aircraft_object.tracked_item.by_unique_identifier[uid];
+
+    // if(item === undefined){
+    //   console.log('[status] search fails');
+
+    //   AlertIOS.alert(
+    //     uid +' Not Found',
+    //     'Just as Geraldo Rivera came up empty searching Al Capone\'s vault, we couldn\'t find a tracked item matching the code you entered.',
+    //     [
+    //       {text: 'Ok, I\'ll Try Harder', onPress: () => console.log('[user-action] dismiss error modal')},
+    //     ]
+    //   )
+    // }else{
+    //   console.log('[status] search succeeds');
+    //   this.setState({ showError: false });
+
+    //     this.props.navigator.push({
+    //       title: uid,
+    //       component: TrackedItemDetail,
+    //       passProps: {
+    //         uid: uid,
+    //         ti: item,
+    //         aircraft_object: this.props.aircraft_object,
+    //       }
+    //     })      
+    // }
   }
 
   render(){
@@ -177,10 +260,18 @@ var styles = StyleSheet.create({
     fontSize: 20,
   },
   countLabel: {
-  color: GLOBAL.COLOR.DARKGRAY,
-  fontSize: 10,
-},
-
+    color: GLOBAL.COLOR.DARKGRAY,
+    fontSize: 10,
+  },
+  listTitle: {
+    marginTop: 5,
+    padding: 10,
+    fontSize: 16,
+    backgroundColor: GLOBAL.COLOR.DARKBLUE,
+    color: 'white',
+    alignSelf: 'stretch',
+    alignItems: 'center',
+  },
   aircraftContainer: {
     paddingVertical: 5,
     paddingHorizontal: 10,

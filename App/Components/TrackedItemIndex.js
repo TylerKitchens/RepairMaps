@@ -3,6 +3,7 @@
 var React = require('react-native');
 var GLOBAL = require('../Globals');
 var Separator = require('./Separator');
+var TISearchField = require('./TISearchField');
 var TrackedItemByATA = require('./TrackedItemByATA');
 var TrackedItemDetail = require('./TrackedItemDetail');
 
@@ -11,7 +12,6 @@ var {
   ListView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableHighlight,
   View,
 } = React;
@@ -26,7 +26,6 @@ class AircraftDetails extends React.Component{
 
     this.state = {
       dataSource: this.ds.cloneWithRows( Object.keys(this.props.aircraft_object.tracked_item.by_ata) ),
-      searchString: '',
     };
   }
 
@@ -48,7 +47,7 @@ class AircraftDetails extends React.Component{
 
   _renderHeader(){
     return(
-      <Text style={styles.searchLabel}>
+      <Text style={styles.browseByHeader}>
         Browse by ATA</Text>
     )
   }
@@ -68,30 +67,25 @@ class AircraftDetails extends React.Component{
     });
   }
 
-  _handleChangeText( str ){
-    str = str.toUpperCase();
+  handleSearch(uid){
+    console.log('[user-action] searches for UID [%s] on TrackedItemIndex', uid);
 
-    this.setState({
-      searchString: str,
-    })
+    let item = this.props.aircraft_object.tracked_item.by_unique_identifier[uid];
 
-    if(str.length >= 4){
-      let uid = str;
-      let item = this.props.aircraft_object.tracked_item.by_unique_identifier[uid];
+    if(item === undefined){
+      console.log('[status] search fails');
 
-      if(item === undefined){
-        AlertIOS.alert(
-          uid +' Not Found',
-          'Just as Geraldo Rivera came up empty searching Al Capone\'s vault, we couldn\'t find a tracked item matching the code you entered.',
-          [
-            {text: 'Ok, I\'ll Try Harder', onPress: () => console.log('Ok Pressed')},
-          ]
-        )
+      AlertIOS.alert(
+        uid +' Not Found',
+        'Just as Geraldo Rivera came up empty searching Al Capone\'s vault, we couldn\'t find a tracked item matching the code you entered.',
+        [
+          {text: 'Ok, I\'ll Try Harder', onPress: () => console.log('[user-action] dismiss error modal')},
+        ]
+      )
+    }else{
+      console.log('[status] search succeeds');
+      this.setState({ showError: false });
 
-        this.setState({
-          searchString: '',
-        })
-      } else {
         this.props.navigator.push({
           title: uid,
           component: TrackedItemDetail,
@@ -100,40 +94,29 @@ class AircraftDetails extends React.Component{
             ti: item,
             aircraft_object: this.props.aircraft_object,
           }
-        })
-      }
+        })      
     }
+
+
   }
 
   render(){
+
     return(
       <View style={styles.container}>
-
         <View style={styles.titleContainer}>
           <Text style={styles.header}> 
             {this.props.aircraft_object.aircraft.reg_number} 
           </Text>
         </View>
 
-        <View style={styles.searchContainer}>
-          <Text style={styles.searchLabel}>
-            TI Lookup
-          </Text>
-          <TextInput 
-            style={styles.searchField} 
-            onChangeText={this._handleChangeText.bind(this)} 
-            autoCorrect={false} 
-            autoCapitalize='characters'
-            placeholder='UID'
-            clearButtonMode='always'
-            value={this.state.searchString} />
-        </View>
-
+        <TISearchField onSearchSubmit={this.handleSearch.bind(this)} />
 
         <ListView 
           dataSource={this.state.dataSource}
           renderRow={this._renderRow.bind(this)}
           renderHeader={this._renderHeader.bind(this)} />
+
       </View>
     )
   }
@@ -145,41 +128,14 @@ var styles = StyleSheet.create({
     flex: 1,
     marginTop: 60,
   },
-  title: {
-    fontSize: 28,
-    alignSelf: 'center',
-  },
-  searchContainer: {
-    backgroundColor: GLOBAL.COLOR.LIGHTBLUE,
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  searchLabel: {
-    fontSize: 20,
+  browseByHeader: {
     paddingLeft: 10,
-    color: GLOBAL.COLOR.DARKBLUE,
-  },
-  searchField: {
-    height: 40,
-    width: 110,
-    fontSize: 18,
-    color: '#000',
-    backgroundColor: '#fff',
-    alignSelf: 'center',
-    borderColor: GLOBAL.COLOR.DARKGRAY,
-    borderRadius: 5,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 2,
-    margin: 10,
   },
   rowContainer: {
     padding: 10,
     flexDirection: 'row',
     alignItems: 'center'
   },
-
   titleContainer: {
     paddingVertical: 15,
     paddingHorizontal: 10,

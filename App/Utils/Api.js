@@ -36,7 +36,7 @@ var Api = {
       return response;
     }
     catch(error){
-      console.warn('WARN: unable to retrieve '+ asset_name +' ['+ key +'] from the network, so attempting to grab cache instead...', error.message);
+      console.warn('[status] WARN: unable to retrieve '+ asset_name +' ['+ key +'] from the network, so attempting to grab cache instead...', error.message);
       let response = await this.getCachedItem( key )
       response.isCachedVersion = true;
       return response;
@@ -50,7 +50,7 @@ var Api = {
       return JSON.parse(response);
     }
     catch(error){
-      console.error('ERROR: unable to retrieve cached data for key '+ key +' because...', error.message)
+      console.error('[status] ERROR: unable to retrieve cached data for key '+ key +' because...', error.message)
       return false;
     }
   },
@@ -59,7 +59,7 @@ var Api = {
     let valStr = JSON.stringify(val);
 
     AsyncStorage.setItem(this.nameSpacedKey( key ), valStr)
-      .then( console.info('SUCCESS: cached the following data for key [%s] %O', key, val))
+      .then( console.info('[status] SUCCESS: cached the following data for key [%s] %O', key, val))
 
     this.setCachedTimestamps( key );
   },
@@ -94,7 +94,7 @@ var Api = {
     const nextTimestampsStr = JSON.stringify(nextTimestamps);
 
     AsyncStorage.setItem(store, nextTimestampsStr)
-      .then( console.info('dbug cacheTimestamps updated with value %O', nextTimestamps) )
+      .then( console.info('[status] cacheTimestamps updated with value %O', nextTimestamps) )
 
     return true;
   },
@@ -109,7 +109,7 @@ var Api = {
 
   getAllKeys(){
     AsyncStorage.getAllKeys()
-      .then( keys => console.info('dbug all keys [%O]', keys) );
+      .then( keys => console.info('[status] all AsyncStorage keys [%O]', keys) );
 
   },
 }

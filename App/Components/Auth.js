@@ -48,7 +48,7 @@ class Auth extends React.Component{
     })
 
     this.props.navigator.push({
-      title: 'Aircraft List',
+      title: 'Home',
       component: AircraftList,
       passProps: {
         aircraft_list,
