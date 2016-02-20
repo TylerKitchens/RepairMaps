@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "moment": "^2.10.6",
-    "react-native": "^0.14.2",
+    "react-native": "^0.20.0",
     "react-native-swipeout": "^2.1.0"
   }
 }
